@@ -1,0 +1,6 @@
+devel_space: /home/nicholasprayogo/catkin_ws/devel
+install: false
+install_space: /home/nicholasprayogo/catkin_ws/install
+profile: default
+source_space: /home/nicholasprayogo/catkin_ws/src
+workspace: /home/nicholasprayogo/catkin_ws

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com)
+     Commit Version: 1.6.0-1-g15f4949  Build Version: 1.6.7594.29634
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="auto_fisher"
+  xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <link
+    name="base_link">
+    <inertial>
+      <origin
+        xyz="-0.24689 -0.29979 0.19957"
+        rpy="0 0 0" />
+      <mass
+        value="4.0427" />
+      <inertia
+        ixx="0.079204"
+        ixy="-8.9533E-17"
+        ixz="2.0728E-16"
+        iyy="0.078459"
+        iyz="-1.1378E-05"
+        izz="0.039337" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://auto_fisher/meshes/base_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.89804 0.91765 0.92941 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://auto_fisher/meshes/base_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="shaft_pole">
+    <inertial>
+      <origin
+        xyz="-0.29644 0.31672 -0.021274"
+        rpy="0 0 0" />
+      <mass
+        value="5.6829" />
+      <inertia
+        ixx="1.3375"
+        ixy="-1.2586E-07"
+        ixz="0.0014204"
+        iyy="0.025161"
+        iyz="-7.4757E-08"
+        izz="1.3586" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://auto_fisher/meshes/shaft_pole.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://auto_fisher/meshes/shaft_pole.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="joint1"
+    type="continuous">
+    <origin
+      xyz="-0.24689 0 0.49409"
+      rpy="2.7827 0.059139 1.5486" />
+    <parent
+      link="base_link" />
+    <child
+      link="shaft_pole" />
+    <axis
+      xyz="0.99801 0 -0.063112" />
+
+    <limit effort="100" velocity="30" lower="-3.14" upper="3.14" />
+    <dynamics damping="0.7"/>
+  </joint>
+  <!-- Used for fixing robot to Gazebo 'base_link' -->
+  <link name="world"/>
+  <joint name="fixed" type="fixed">
+    <parent link="world"/>
+    <child link="base_link"/>
+  </joint>
+
+  <transmission name="simple_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="joint1">
+        <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="stepper">
+        <mechanicalReduction>20</mechanicalReduction>
+        <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      </actuator>
+  </transmission>
+  <gazebo>
+      <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+        <robotNamespace>/fisher_robot</robotNamespace>
+      </plugin>
+  </gazebo>
+  <xacro:include filename="$(find gazebo_ros_motors)/xacro/dc_motor.xacro"/>
+  <xacro:dc_motor motor_name="dc_motor" parent_link="base_link" child_link="shaft_pole">
+    <xacro:property name="params_yaml" value="$(find gazebo_ros_motors)/params/dc_motor.yaml"/>
+    <origin xyz="0 0 0.2" rpy="0 0 0"/>
+  </xacro:dc_motor>
+</robot>
