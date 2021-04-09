@@ -52,6 +52,8 @@
         rpy="0 0 0" />
       <mass
         value="5.6829" />
+        <!-- <mass
+          value="3" /> -->
       <inertia
         ixx="1.3375"
         ixy="-1.2586E-07"
@@ -83,10 +85,13 @@
           filename="package://auto_fisher/meshes/shaft_pole.STL" />
       </geometry>
     </collision>
+    <sensor name="force_torque" type="force_torque">
+      <update_rate>20</update_rate>
+    </sensor>
   </link>
   <joint
     name="joint1"
-    type="continuous">
+    type="revolute">
     <origin
       xyz="-0.24689 0 0.49409"
       rpy="2.7827 0.059139 1.5486" />
@@ -97,8 +102,9 @@
     <axis
       xyz="0.99801 0 -0.063112" />
 
-    <limit effort="100" velocity="30" lower="-3.14" upper="3.14" />
+    <limit effort="400" velocity="0.63" lower="-3.14" upper="3.14" />
     <dynamics damping="0.7"/>
+
   </joint>
   <!-- Used for fixing robot to Gazebo 'base_link' -->
   <link name="world"/>
@@ -146,13 +152,27 @@
     </plugin>
   </gazebo> -->
 
+  <gazebo reference="joint1">
+    <provideFeedback>true</provideFeedback>
+  </gazebo>
+
+  <!-- must also specify plugin path -->
+  <gazebo>
+    <plugin name="ft_sensor_plugin" filename="libgazebo_ros_ft_sensor.so">
+      <updateRate>20</updateRate>
+      <topicName>ft_sensor_topic</topicName>
+      <gaussianNoise>0.0</gaussianNoise>
+      <jointName>joint1</jointName>
+    </plugin>
+  </gazebo>
+
   <transmission name="simple_trans">
       <type>transmission_interface/SimpleTransmission</type>
       <joint name="joint1">
         <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
       </joint>
       <actuator name="stepper">
-        <mechanicalReduction>20</mechanicalReduction>
+        <mechanicalReduction>50</mechanicalReduction>
         <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
       </actuator>
   </transmission>
@@ -161,6 +181,7 @@
         <robotNamespace>/fisher_robot</robotNamespace>
       </plugin>
   </gazebo>
+
 
 
 
