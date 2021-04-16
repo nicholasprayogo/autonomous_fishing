@@ -1,0 +1,7 @@
+HX711.c:22:9:shiftInSlow	16	static
+HX711.c:35:6:delay_us	24	static
+HX711.c:41:15:readCount	32	static
+HX711.c:123:6:wait_ready	16	static
+HX711.c:135:6:is_ready	8	static
+HX711.c:141:6:read	24	static
+HX711.c:195:6:read_average	24	static

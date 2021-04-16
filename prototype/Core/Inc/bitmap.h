@@ -1,8 +1,10 @@
 /*
  * bitmap.h
  *
- *  Created on: 17-Jun-2019
- *      Author: poe
+ *
+ *      Author: Hasib Arian
+ *
+ *      ~logo of Ryerson embelem~
  */
 
 #ifndef BITMAP_H_

@@ -58,6 +58,26 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define EMERGENCY_SHUTDOWN_Pin GPIO_PIN_13
+#define EMERGENCY_SHUTDOWN_GPIO_Port GPIOC
+#define EMERGENCY_SHUTDOWN_EXTI_IRQn EXTI15_10_IRQn
+#define MOTOR_STEP_PIN_Pin GPIO_PIN_5
+#define MOTOR_STEP_PIN_GPIO_Port GPIOA
+#define Motor_Initialized_Pin GPIO_PIN_11
+#define Motor_Initialized_GPIO_Port GPIOB
+#define ONBOARD__RED__LED_Pin GPIO_PIN_14
+#define ONBOARD__RED__LED_GPIO_Port GPIOB
+#define LIMIT_SWITCH_Pin GPIO_PIN_6
+#define LIMIT_SWITCH_GPIO_Port GPIOG
+#define LIMIT_SWITCH_EXTI_IRQn EXTI9_5_IRQn
+#define ONBOARD__GREEN__LED_Pin GPIO_PIN_7
+#define ONBOARD__GREEN__LED_GPIO_Port GPIOC
+#define EXTERNAL_LED_BLUE_Pin GPIO_PIN_11
+#define EXTERNAL_LED_BLUE_GPIO_Port GPIOA
+#define MOTOR_DIRECTION_PIN_Pin GPIO_PIN_12
+#define MOTOR_DIRECTION_PIN_GPIO_Port GPIOA
+#define ONBOARD__BLUE__LED_Pin GPIO_PIN_7
+#define ONBOARD__BLUE__LED_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

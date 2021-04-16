@@ -26,7 +26,13 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "ssd1306.h"
+#include "HX711.h"
+#include <stdio.h>
+#include <string.h>
+#include "fonts.h"
+//#include "i2c.h"
+//#include "bitmap.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -47,29 +53,63 @@
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
 
+int motorAtBoundary = 0; //check if motor at boundary
+int initialized =0;
+
+//-----motor pins------
+//const int dirPin = 7; ||GPIOA, GPIO_PIN12, SET/RESET|| -- OUTPUT
+//const int stepPin = 8; ||GPIOA, GPIO_PIN5, SET/RESET|| -- OUTPUT
+
+const int stepsPerRevolution = 200;
+
+//-----routine pins------
+//const uint8_t motorLimit = 2;  ||GPIO  ||
+//const uint8_t emergencyButton= 3;  ||GPIO  ||
+
+//-----reading pin-------
+long reading=0;
+long prevReading;
+int pollCast = 0;
+
+
+const uint8_t initLED = 13;//green or blue LED ||GPIO  ||
+const uint8_t emergencyLED = 12;//red LED ||GPIO  ||
+//uint8_t led_state = HIGH; check led state||GPIO  ||
+int passTime = 0;
+
+//-----fishy vars-------
+int fishCaught = 0;
+int fishRejected = 0;
+
+
 /* USER CODE END Variables */
-/* Definitions for Blink01 */
-osThreadId_t Blink01Handle;
-const osThreadAttr_t Blink01_attributes = {
-  .name = "Blink01",
+/* Definitions for OLED */
+osThreadId_t OLEDHandle;
+const osThreadAttr_t OLED_attributes = {
+  .name = "OLED",
+  .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 128 * 4
 };
-/* Definitions for Blink02 */
-osThreadId_t Blink02Handle;
-const osThreadAttr_t Blink02_attributes = {
-  .name = "Blink02",
+/* Definitions for MOTOR */
+osThreadId_t MOTORHandle;
+const osThreadAttr_t MOTOR_attributes = {
+  .name = "MOTOR",
+  .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityBelowNormal,
-  .stack_size = 128 * 4
 };
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
 
+void motorInit();
+void castPole();
+void reelPole();
+void rejectFish();
+
 /* USER CODE END FunctionPrototypes */
 
-void StartBlink01(void *argument);
-void StartBlink02(void *argument);
+void OLEDupdater(void *argument);
+void MOTORupdater(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -100,11 +140,11 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
-  /* creation of Blink01 */
-  Blink01Handle = osThreadNew(StartBlink01, NULL, &Blink01_attributes);
+  /* creation of OLED */
+  OLEDHandle = osThreadNew(OLEDupdater, NULL, &OLED_attributes);
 
-  /* creation of Blink02 */
-  Blink02Handle = osThreadNew(StartBlink02, NULL, &Blink02_attributes);
+  /* creation of MOTOR */
+  MOTORHandle = osThreadNew(MOTORupdater, NULL, &MOTOR_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -116,46 +156,201 @@ void MX_FREERTOS_Init(void) {
 
 }
 
-/* USER CODE BEGIN Header_StartBlink01 */
+/* USER CODE BEGIN Header_OLEDupdater */
 /**
-  * @brief  Function implementing the Blink01 thread.
+  * @brief  Function implementing the OLED thread.
   * @param  argument: Not used
   * @retval None
   */
-/* USER CODE END Header_StartBlink01 */
-void StartBlink01(void *argument)
+/* USER CODE END Header_OLEDupdater */
+void OLEDupdater(void *argument)
 {
-  /* USER CODE BEGIN StartBlink01 */
+  /* USER CODE BEGIN OLEDupdater */
   /* Infinite loop */
-  for(;;)
-  {
+	SSD1306_Init();  // initialise
+	for(;;)
+	{
 
-	HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_7);
-    osDelay(500);
-  }
-  /* USER CODE END StartBlink01 */
+	      SSD1306_Clear();
+	  if (motorAtBoundary == 1 && initialized == 1){
+
+	      SSD1306_GotoXY (0,0);
+	      SSD1306_Puts ("Fish Caught: 1" , &Font_7x10, 1);
+	      SSD1306_GotoXY (0, 15);
+	      SSD1306_Puts ("Fish Rejected: 2", &Font_7x10, 1);
+	      SSD1306_GotoXY (0, 30);
+	      SSD1306_Puts ("Action:Waiting For", &Font_7x10, 1);
+	      SSD1306_GotoXY (0, 40);
+	      SSD1306_Puts ("Fish", &Font_7x10, 1);
+	      SSD1306_UpdateScreen(); //display
+	      HAL_Delay (5000);
+	      SSD1306_Clear();
+
+	  }
+
+	  if(motorAtBoundary == 0){
+	      SSD1306_GotoXY (0,0);
+	      SSD1306_Puts ("Motor Initializing " , &Font_7x10, 1);
+	      SSD1306_GotoXY (0, 15);
+	      SSD1306_Puts ("", &Font_7x10, 1);
+	      SSD1306_GotoXY (0, 30);
+	      SSD1306_Puts ("Please Wait", &Font_7x10, 1);
+	      SSD1306_UpdateScreen(); //display
+	      HAL_Delay (5000);
+	      SSD1306_Clear();
+	  }
+
+
+
+	}
+  /* USER CODE END OLEDupdater */
 }
 
-/* USER CODE BEGIN Header_StartBlink02 */
+/* USER CODE BEGIN Header_MOTORupdater */
 /**
-* @brief Function implementing the Blink02 thread.
+* @brief Function implementing the MOTOR thread.
 * @param argument: Not used
 * @retval None
 */
-/* USER CODE END Header_StartBlink02 */
-void StartBlink02(void *argument)
+/* USER CODE END Header_MOTORupdater */
+void MOTORupdater(void *argument)
 {
-  /* USER CODE BEGIN StartBlink02 */
+  /* USER CODE BEGIN MOTORupdater */
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+
+	  if (initialized == 0){ //reel
+		  motorInit();
+	  }
+
+
+	  if (passTime == 0){
+		  if (pollCast == 0){
+			  castPole(); 		//cast
+			  pollCast =1;
+			  osDelay(5000);	//wait
+		  }
+		  if (pollCast == 1){		//reel when fish detected
+			  reelPole();
+			  pollCast = 0;
+			  osDelay(10000);
+		  }
+		  passTime++;
+	  }
+
+	  if (passTime == 1){
+
+		  rejectFish(); // cast, wait, reel, unreel
+		  passTime++;
+	  }
+
   }
-  /* USER CODE END StartBlink02 */
+
+  /* USER CODE END MOTORupdater */
 }
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
+
+void motorInit(){
+
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, SET);// set motor dir clockwise LOW for cc // SET MOTOR DIR SO THAT IT ROTATES BACKWARDS
+	for(int x = 0; x < stepsPerRevolution; x++){
+		if((HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_6)) == 0){ //check if the motor has been initialized.
+			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, SET);
+	        osDelay(15); //perfect speed, change to 20 for slow speed!
+	        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, RESET);
+	        osDelay(15);
+		}
+		else{
+			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, SET);
+//			osDelay(250);
+//			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, RESET);
+//			osDelay(250);
+//			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, SET);
+//			osDelay(250);
+//			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, RESET);
+//			osDelay(500);
+			initialized =1;
+			motorAtBoundary = 1;
+	        return;
+	      }
+	}
+
+}
+
+void castPole(){
+
+	  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_12, RESET); //write dir
+
+	  for(int x = 0; x < 50; x++){
+		  if(motorAtBoundary == 1){  //check for initialization
+	          HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, SET);
+	          osDelay(15); //perfect speed, change to 20 for slow speed!
+	          HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, RESET);
+	          osDelay(15);
+		  }
+	  }
+	  //update OLED
+
+}
+void reelPole(){
+
+	  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_12, SET);  // high towards back of A frame
+
+	  for(int x = 0; x < 50; x++)
+	  {
+        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, SET);
+        osDelay(15); //perfect speed, change to 20 for slow speed!
+        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, RESET);
+        osDelay(15);
+	  }
+
+	  fishCaught++;
+
+	  //update OLED
+
+}
+
+//cast, reel, cast!
+void rejectFish(){
+
+
+	  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_12, RESET);  // CAST
+	  for(int x = 0; x < 50; x++){
+		  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, SET);
+		  osDelay(15); //perfect speed, change to 20 for slow speed!
+		  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, RESET);
+		  osDelay(15);
+	  }
+
+	  osDelay(10000);					//WAIT
+	  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_12, SET); //REEL
+	  for(int x = 0; x < 35; x++){
+		  if(motorAtBoundary == 1){  //check for initialization
+	          HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, SET);
+	          osDelay(15); //perfect speed, change to 20 for slow speed!
+	          HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, RESET);
+	          osDelay(15);
+		  }
+	  }
+
+	  osDelay(100);
+
+	  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_12, RESET);  // UNREEL
+	  for(int x = 0; x < 35; x++)
+	  {
+      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, SET);
+      osDelay(15); //perfect speed, change to 20 for slow speed!
+      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, RESET);
+      osDelay(15);
+	  }
+
+	  fishRejected++;
+
+
+}
 
 /* USER CODE END Application */
 

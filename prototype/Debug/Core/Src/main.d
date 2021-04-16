@@ -40,7 +40,8 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h \
  ../Core/Inc/i2c.h ../Core/Inc/main.h ../Core/Inc/gpio.h \
  ../Core/Inc/bitmap.h ../Core/Inc/fonts.h ../Core/Inc/ssd1306.h \
- ../Core/Inc/fonts.h ../Core/Inc/StepLib.h ../Core/Inc/test.h
+ ../Core/Inc/fonts.h ../Core/Inc/StepLib.h ../Core/Inc/test.h \
+ ../Core/Inc/HX711.h
 
 ../Core/Inc/main.h:
 
@@ -139,3 +140,5 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Core/Inc/StepLib.h:
 
 ../Core/Inc/test.h:
+
+../Core/Inc/HX711.h:

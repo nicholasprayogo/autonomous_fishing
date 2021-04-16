@@ -1,6 +1,7 @@
 /**
  * original author:  Tilen Majerle<tilen@majerle.eu>
  * modification for STM32f10x: Alexander Lutsai<s.lyra@ya.ru>
+ * modification for STM32L496ZG for capstone: Hasib Arian <Hasib.arian@ryerson.ca>
 
    ----------------------------------------------------------------------
    	Copyright (C) Alexander Lutsai, 2016

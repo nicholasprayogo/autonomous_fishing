@@ -30,6 +30,9 @@
 #include "ssd1306.h"
 #include "StepLib.h"
 #include "test.h"
+#include <stdio.h>
+#include <string.h>
+#include <HX711.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -94,59 +97,117 @@ int main(void)
   MX_GPIO_Init();
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
-  SSD1306_Init();  // initialise
 
-    /// lets print some string
+//  SSD1306_Init();  // initialise
+//    /// lets print some string
+// 	  HAL_Delay(3000);
+//      SSD1306_GotoXY (0,0);
+//      SSD1306_Puts ("Autonomous" , &Font_7x10, 1);
+//      SSD1306_GotoXY (0, 15);
+//      SSD1306_Puts ("Pole & Line", &Font_7x10, 1);
+//      SSD1306_GotoXY (0, 30);
+//      SSD1306_Puts ("Fishing System", &Font_7x10, 1);
+//      SSD1306_UpdateScreen(); //display
+//      HAL_Delay (3000);
+//      SSD1306_Clear();
+//
+//      SSD1306_GotoXY (0,0);
+//      SSD1306_Puts ("Created By:", &Font_7x10, 1);
+//      SSD1306_GotoXY (0, 18);
+//      SSD1306_Puts ("Heather & Nicholas", &Font_7x10, 1);
+//      SSD1306_GotoXY (0, 36);
+//      SSD1306_Puts ("Imran & Hasib", &Font_7x10, 1);
+//      SSD1306_UpdateScreen(); //display
+//      HAL_Delay (3000);
+//      SSD1306_Clear();
+//
+//      SSD1306_DrawBitmap(0,0,logo, 128, 64, 1);
+//      SSD1306_UpdateScreen();
+//
+//      HAL_Delay(2000);
+//
+//      SSD1306_ScrollRight(0x00, 0x0f);    // scroll entire screen right
+//
+//      HAL_Delay (2000);
+//
+//      SSD1306_ScrollLeft(0x00, 0x0f);  // scroll entire screen left
+//
+//      HAL_Delay (2000);
+//
+//      SSD1306_Scrolldiagright(0x00, 0x0f);  // scroll entire screen diagonal right
+//
+//      HAL_Delay (2000);
+//
+//      SSD1306_Scrolldiagleft(0x00, 0x0f);  // scroll entire screen diagonal left
+//
+//      HAL_Delay (2000);
+//
+//      SSD1306_Stopscroll();   // stop scrolling. If not done, screen will keep on scrolling
+//
+//
+//      SSD1306_InvertDisplay(1);   // invert the display
+//
+//      HAL_Delay(2000);
+//
+//      SSD1306_InvertDisplay(0);  // normalize the display
+
+
+      SSD1306_Clear();
 
       SSD1306_GotoXY (0,0);
-      SSD1306_Puts ("Autonomous", &Font_7x10, 1);
+      SSD1306_Puts ("Fish Caught: 1" , &Font_7x10, 1);
       SSD1306_GotoXY (0, 15);
-      SSD1306_Puts ("Pole & Line", &Font_7x10, 1);
+      SSD1306_Puts ("Fish Rejected: 2", &Font_7x10, 1);
       SSD1306_GotoXY (0, 30);
-      SSD1306_Puts ("Fishing System", &Font_7x10, 1);
+      SSD1306_Puts ("Action:Waiting For", &Font_7x10, 1);
+      SSD1306_GotoXY (0, 40);
+      SSD1306_Puts ("Fish", &Font_7x10, 1);
       SSD1306_UpdateScreen(); //display
-      HAL_Delay (3000);
+      HAL_Delay (5000);
       SSD1306_Clear();
 
       SSD1306_GotoXY (0,0);
-      SSD1306_Puts ("Created By:", &Font_7x10, 1);
-      SSD1306_GotoXY (0, 18);
-      SSD1306_Puts ("Heather & Nicholas", &Font_7x10, 1);
-      SSD1306_GotoXY (0, 36);
-      SSD1306_Puts ("Imran & Hasib", &Font_7x10, 1);
+      SSD1306_Puts ("Motor Initializing " , &Font_7x10, 1);
+      SSD1306_GotoXY (0, 15);
+      SSD1306_Puts ("", &Font_7x10, 1);
+      SSD1306_GotoXY (0, 30);
+      SSD1306_Puts ("Please Wait", &Font_7x10, 1);
       SSD1306_UpdateScreen(); //display
-      HAL_Delay (3000);
+      HAL_Delay (5000);
       SSD1306_Clear();
 
-      SSD1306_DrawBitmap(0,0,logo, 128, 64, 1);
-      SSD1306_UpdateScreen();
-
-      HAL_Delay(2000);
-
-      SSD1306_ScrollRight(0x00, 0x0f);    // scroll entire screen right
-
-      HAL_Delay (2000);
-
-      SSD1306_ScrollLeft(0x00, 0x0f);  // scroll entire screen left
-
-      HAL_Delay (2000);
-
-      SSD1306_Scrolldiagright(0x00, 0x0f);  // scroll entire screen diagonal right
-
-      HAL_Delay (2000);
-
-      SSD1306_Scrolldiagleft(0x00, 0x0f);  // scroll entire screen diagonal left
-
-      HAL_Delay (2000);
-
-      SSD1306_Stopscroll();   // stop scrolling. If not done, screen will keep on scrolling
-
-
+      SSD1306_GotoXY (0,0);
+      SSD1306_Puts ("EMERGENCY" , &Font_7x10, 1);
+      SSD1306_GotoXY (0, 15);
+      SSD1306_Puts ("BUTTON", &Font_7x10, 1);
+      SSD1306_GotoXY (0, 30);
+      SSD1306_Puts ("PRESSED", &Font_7x10, 1);
+      SSD1306_UpdateScreen(); //display
       SSD1306_InvertDisplay(1);   // invert the display
+      HAL_Delay (3000);
+      SSD1306_InvertDisplay(0);   // invert the display
+      HAL_Delay (3000);
+      SSD1306_InvertDisplay(1);   // invert the display
+      HAL_Delay (5000);
+      SSD1306_Clear();
 
-      HAL_Delay(2000);
 
-      SSD1306_InvertDisplay(0);  // normalize the display
+
+
+//  long holder = read(); // read from the FUCKING shits
+//	   		     /// lets print some string
+//	   	     char result[50];
+//	   	     int num = holder;
+//	   	     sprintf(result, "%d", num);
+//	   	     printf("\n The string for the num is %s", result);
+//
+//	   	  SSD1306_Clear();
+//
+//	   	  HAL_Delay(10000);
+//	        SSD1306_GotoXY (0,0);
+//	        SSD1306_Puts (result , &Font_7x10, 1);
+//	        HAL_Delay (3000);
+//	        SSD1306_Clear();
 
 
   /* USER CODE END 2 */
@@ -165,51 +226,6 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-
-		  //// HORSE ANIMATION START //////
-//
-//		  SSD1306_Clear();
-//		  SSD1306_DrawBitmap(0,0,horse1,128,64,1);
-//		  SSD1306_UpdateScreen();
-//
-//		  SSD1306_Clear();
-//		  SSD1306_DrawBitmap(0,0,horse2,128,64,1);
-//		  SSD1306_UpdateScreen();
-//
-//		  SSD1306_Clear();
-//		  SSD1306_DrawBitmap(0,0,horse3,128,64,1);
-//		  SSD1306_UpdateScreen();
-//
-//		  SSD1306_Clear();
-//		  SSD1306_DrawBitmap(0,0,horse4,128,64,1);
-//		  SSD1306_UpdateScreen();
-//
-//		  SSD1306_Clear();
-//		  SSD1306_DrawBitmap(0,0,horse5,128,64,1);
-//		  SSD1306_UpdateScreen();
-//
-//		  SSD1306_Clear();
-//		  SSD1306_DrawBitmap(0,0,horse6,128,64,1);
-//		  SSD1306_UpdateScreen();
-//
-//
-//		  SSD1306_Clear();
-//		  SSD1306_DrawBitmap(0,0,horse7,128,64,1);
-//		  SSD1306_UpdateScreen();
-//
-//		  SSD1306_Clear();
-//		  SSD1306_DrawBitmap(0,0,horse8,128,64,1);
-//		  SSD1306_UpdateScreen();
-//
-//
-//		  SSD1306_Clear();
-//		  SSD1306_DrawBitmap(0,0,horse9,128,64,1);
-//		  SSD1306_UpdateScreen();
-//
-//
-//		  SSD1306_Clear();
-//		  SSD1306_DrawBitmap(0,0,horse10,128,64,1);
-//		  SSD1306_UpdateScreen();
 
 
     /* USER CODE BEGIN 3 */

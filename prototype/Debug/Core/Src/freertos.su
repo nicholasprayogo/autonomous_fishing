@@ -1,3 +1,7 @@
-freertos.c:81:6:MX_FREERTOS_Init	8	static
-freertos.c:126:6:StartBlink01	16	static
-freertos.c:146:6:StartBlink02	16	static
+freertos.c:121:6:MX_FREERTOS_Init	8	static
+freertos.c:166:6:OLEDupdater	16	static
+freertos.c:216:6:MOTORupdater	16	static
+freertos.c:256:6:motorInit	16	static
+freertos.c:283:6:castPole	16	static
+freertos.c:298:6:reelPole	16	static
+freertos.c:317:6:rejectFish	24	static
